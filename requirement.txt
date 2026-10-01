@@ -1,0 +1,6 @@
+Flask
+Pillow
+numpy
+tensorflow
+python-dotenv
+huggingface-hub
