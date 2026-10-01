@@ -46,8 +46,12 @@ MODEL = None
 if load_model is not None and os.path.exists(MODEL_PATH):
     try:
         MODEL = load_model(MODEL_PATH)
-    except Exception:
-        MODEL = None
+        print("CNN Model Loaded",MODEL_PATH)
+    except Exception as e:
+        print("❌ CNN MODEL FAILED TO LOAD")
+        print("MODEL PATH:", MODEL_PATH)
+        print("ERROR:", repr(e))
+        raise
 
 
 def preprocess_image(uploaded_file):
