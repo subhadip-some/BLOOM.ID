@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BloomID — Neo-Brutalist Flower Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+      <div class="logo">✿ BLOOM.ID</div>
+      <div class="badge">FLOWER VISION / v1.0</div>
+    </nav>
+
+    <main class="hero">
+      <section>
+        <p class="badge badge-with-gif">
+          <span>AI BOTANIST IN YOUR POCKET</span>
+          <img class="badge-gif" src="{{ url_for('static', filename='css/pixel-cat.gif') }}" alt="Cat mascot" />
+        </p>
+        <h1>WHAT<br>FLOWER<br>IS <span>THAT?</span></h1>
+        <p class="sub">Drop a flower photo into the little garden below. The interface will simulate a classifier prediction(CNN) and an explaination for you.</p>
+        <div class="weather-box" id="weatherBox">
+          <div class="weather-box-head">
+            <div class="weather-head-left">
+              <img class="weather-gif" src="{{ url_for('static', filename='css/pixel-art-yellow-duck-l3kowra9z0qk5v77.gif') }}" alt="Weather icon" />
+              <span class="kicker">LOCAL WEATHER</span>
+            </div>
+            <span class="weather-location" id="weatherLocation">--</span>
+          </div>
+          <form class="weather-form" id="weatherForm">
+            <input id="weatherInput" type="text" placeholder="Enter your city" autocomplete="off" required>
+            <button class="weather-submit" type="submit" aria-label="Get weather">→</button>
+          </form>
+          <div class="weather-values" aria-live="polite">
+            <div><b id="weatherTemp">--</b><small>TEMP °C</small></div>
+            <div><b id="weatherHumidity">--</b><small>HUMIDITY</small></div>
+            <div><b id="weatherRain">--</b><small>RAIN MM</small></div>
+            <div><b id="weatherWind">--</b><small>WIND KM/H</small></div>
+          </div>
+          <p class="weather-status" id="weatherStatus">Live conditions for your location</p>
+        </div>
+      </section>
+
+      <section>
+        <div class="card">
+          <form id="uploadForm" enctype="multipart/form-data">
+            <div class="drop" id="drop">
+              <div class="icon" id="icon">🌼</div>
+              <img id="preview" alt="Uploaded flower preview">
+              <strong id="dropTitle">Drop your flower here</strong>
+              <small>JPG / PNG / WEBP · MAX 10MB</small>
+              <label class="btn" for="file">CHOOSE PHOTO</label>
+              <input id="file" name="file" type="file" accept="image/*">
+            </div>
+          </form>
+
+          <div class="result" id="result">
+            <div class="result-top">
+              <div>
+                <span class="kicker">PREDICTION</span>
+                <div class="flower-name" id="flowerName">Daisy</div>
+                <div class="conf">CONFIDENCE: <b id="confidence">96.4%</b></div>
+              </div>
+              <div style="font-size:55px" id="resultEmoji">🌼</div>
+            </div>
+            <div class="meter"><i id="meter"></i></div>
+            <div class="details" id="details">A cheerful flower with a classic yellow center and radiating petals.</div>
+            <button class="btn" id="reset" type="button">TRY ANOTHER FLOWER ↻</button>
+          </div>
+
+          <div class="chatbox" id="chatbox">
+            <div class="chat-header">
+              <span>Flower Expert</span>
+              <span class="chat-role">role: flower expert</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="msg bot">Ask about care, meaning, or growing habits for your flower.</div>
+            </div>
+            <form class="chat-form" id="chatForm">
+              <input id="chatInput" type="text" placeholder="Ask about this flower..." autocomplete="off">
+              <button type="submit" class="btn chat-btn">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>BUILT FOR CURIOUS HUMANS + HAPPY PLANTS · NO FLOWERS WERE HARMED 🌱</footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
