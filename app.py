@@ -1,5 +1,6 @@
 import os
 import json
+import threading
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
@@ -14,9 +15,14 @@ except Exception:
     pass
 
 try:
-    from tensorflow.keras.models import load_model
-except Exception:
-    load_model = None
+    from ai_edge_litert.interpreter import Interpreter
+except ImportError:
+    try:
+        import tensorflow as tf
+
+        Interpreter = tf.lite.Interpreter
+    except ImportError:
+        Interpreter = None
 
 try:
     from huggingface_hub import InferenceClient
@@ -40,15 +46,24 @@ FLOWER_DETAILS = {
     "Sunflower": "A bold, cheerful flower known for its bright petals and strong sun-facing habit.",
     "Tulip": "A classic spring flower with a smooth, cup-shaped bloom and vibrant color.",
 }
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "flower_cnn.keras")
-MODEL = None
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "flower_cnn.tflite")
+INTERPRETER = None
+MODEL_INPUT = None
+MODEL_OUTPUT = None
+INTERPRETER_LOCK = threading.Lock()
 
-if load_model is not None and os.path.exists(MODEL_PATH):
+if Interpreter is None and os.path.exists(MODEL_PATH):
+    raise RuntimeError("Install ai-edge-litert to load the TFLite flower model")
+
+if Interpreter is not None and os.path.exists(MODEL_PATH):
     try:
-        MODEL = load_model(MODEL_PATH)
-        print("CNN Model Loaded",MODEL_PATH)
+        INTERPRETER = Interpreter(model_path=MODEL_PATH)
+        INTERPRETER.allocate_tensors()
+        MODEL_INPUT = INTERPRETER.get_input_details()[0]
+        MODEL_OUTPUT = INTERPRETER.get_output_details()[0]
+        print("TFLite CNN Model Loaded", MODEL_PATH)
     except Exception as e:
-        print("❌ CNN MODEL FAILED TO LOAD")
+        print("TFLite CNN MODEL FAILED TO LOAD")
         print("MODEL PATH:", MODEL_PATH)
         print("ERROR:", repr(e))
         raise
@@ -63,9 +78,13 @@ def preprocess_image(uploaded_file):
 
 
 def generate_prediction(img_array):
-    if MODEL is not None:
+    if INTERPRETER is not None:
         try:
-            probs = MODEL.predict(img_array, verbose=0)[0]
+            input_tensor = img_array.astype(MODEL_INPUT["dtype"])
+            with INTERPRETER_LOCK:
+                INTERPRETER.set_tensor(MODEL_INPUT["index"], input_tensor)
+                INTERPRETER.invoke()
+                probs = INTERPRETER.get_tensor(MODEL_OUTPUT["index"])[0]
             idx = int(np.argmax(probs))
             confidence = float(probs[idx] * 100)
             label = FLOWER_CLASSES[idx] if idx < len(FLOWER_CLASSES) else str(idx)
